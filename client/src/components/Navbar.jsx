@@ -1,12 +1,12 @@
 import React from "react";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { GearWideConnected } from "react-bootstrap-icons";
 
 const Navigation = () => {
 
     return (
         <Navbar data-bs-theme="dark">
-            <Container fluid>
+            <Container>
                 <Navbar.Brand href="/">&#62;&#62;&#62; HEAD Chef</Navbar.Brand>
                 <Navbar.Toggle />
                 <Navbar.Collapse className="justify-content-end">

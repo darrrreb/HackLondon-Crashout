@@ -1,70 +1,45 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #000000;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --light-color: #000000;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  background-image: url('/path/to/image.jpg');
   min-height: 100vh;
+  width: 100vw;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-color);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  monospace;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.heading {
+  margin-top: 2%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.card {
+  border-radius: 30px;
+}
+
+.card-image {
+  border-radius: 30px 30px 0px 0px;
+}
+
+.header-landing {
+  padding: 0px 50px 0px;
+  color: var(--text-color);
+}
+
+.subtitle-landing {
+  padding: 0px 50px 15px;
+  color: var(--link-color);
 }
 
 .navbar {
@@ -73,4 +48,149 @@ button:focus-visible {
   padding-top: 15px;
   padding-right: 8px;
   z-index: 10;
+}
+
+.image-container {
+  margin-top: 65px;
+}
+
+.lp_img {
+  height: 55vh;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border-color: var(--primary-color);
+  border-radius: 50px;
+}
+
+.btn-primary:hover {
+  background-color: var(--phover-color);
+  color: var(--text-color);
+  border-color: var(--phover-color);
+}
+
+.btn-primary-landing {
+  margin: 0px 0px 5px;
+  z-index: 1;
+}
+
+.btn-secondary {
+  background-color: var(--dark-color);
+  color: var(--secondary-color);
+  border-color: var(--dark-color);
+  border-radius: 50px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--shover-color);
+  color: var(--dark-color);
+  border-color: var(--shover-color);
+}
+
+.btn-link {
+  color: var(--link-color);
+  text-decoration: none;
+  z-index: 1;
+}
+
+.btn-link:hover {
+  color: var(--text-color);
+}
+
+.page-link {
+  color: var(--dark-color);
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.page-link:hover {
+  background-color: var(--phover-color);
+  color: var(--text-color);
+  border-color: var(--phover-color);
+}
+
+.active .page-link {
+  background-color: var(--secondary-color);
+  color: var(--dark-color);
+  border-color: var(--secondary-color);
+}
+
+.div-setting {
+  margin-top: 3%;
+  margin-bottom: 5%;
+}
+
+.modal-header {
+  border-width: 0px;
+}
+
+.btn-close {
+  color: var(--dark-color);
+}
+
+.modal-body {
+  border-width: 0px;
+}
+
+.modal-footer {
+  border-width: 0px;
+}
+
+.modal-content {
+  padding-left: 5%;
+  padding-right: 5%;
+  background-color: var(--secondary-color);
+  color: var(--dark-color);
+}
+
+.society-component {
+  padding: 20px;
+  background-color: var(--primary-color);
+  border-radius: 20px;
+  width: 100%;
+}
+
+.floating-edit-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Scrollbar - Ensures it stays inside border radius */
+.scrollable-div {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-color) rgba(255, 255, 255, 0.2);
+  overflow: hidden; /* Prevents scrollbar overflow */
+  padding-right: 5px; /* Adjust so scrollbar stays inside */
+}
+
+/* WebKit Browsers (Chrome, Safari, Edge) */
+.scrollable-div::-webkit-scrollbar {
+  width: 8px; /* Adjust width */
+}
+
+.scrollable-div::-webkit-scrollbar-track {
+  background: rgba(255, 146, 240, 0.2); /* Track color */
+}
+
+.scrollable-div::-webkit-scrollbar-thumb {
+  background: var(--text-color);
+  border: 2px solid transparent; /* Prevents overlap with border */
+  background-clip: padding-box; /* Ensures scrollbar is inside */
+}
+
+/* On Hover */
+.scrollable-div::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
