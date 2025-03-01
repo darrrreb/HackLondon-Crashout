@@ -35,26 +35,3 @@ fun processServe(data: JsonObject) {
     println("Processing serve request")
     println(data)
 }
-
-/*
-
-fun generateDiff(fil1: ByteArray, fil2: ByteArray) {
-
-}
-
-fun generateShortMessage(diff: ByteArray): String {
-
-}
-
-fun generateLongMessage(diff: ByteArray): String {
-
-}
-
-fun getDiffs(){
-
-}
-
-fun applyDiffs(){
-}
-*/
-

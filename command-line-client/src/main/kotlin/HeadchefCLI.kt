@@ -1,9 +1,10 @@
+import commands.CookCommand
 import commands.InitialiseCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 
-@CommandLine.Command(name="chef", mixinStandardHelpOptions = true, version = ["headchef 1.0"],
-    subcommands = [InitialiseCommand::class])
+@Command(name="chef", mixinStandardHelpOptions = true, version = ["headchef 1.0"],
+    subcommands = [InitialiseCommand::class, CookCommand::class])
 class HeadchefCLI : Runnable{
     override fun run(){
         println("Welcome to >>>HEAD Chef!")
@@ -11,7 +12,6 @@ class HeadchefCLI : Runnable{
         println("Get started by typing 'headchef --help' to see the available commands")
     }
 }
-
 
 
 fun main(args: Array<String>) {

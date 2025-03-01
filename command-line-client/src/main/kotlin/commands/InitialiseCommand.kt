@@ -4,7 +4,6 @@ import FileScanner
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
-import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import okhttp3.MediaType
@@ -22,21 +21,28 @@ class InitialiseCommand : Runnable {
     val dir = System.getProperty("user.dir")
 
     override fun run() {
-
-        if(!ensureNotInitialised()){
+        if (!ensureNotInitialised()) {
             return
         }
 
+        val ignoredFiles = FileScanner.getIgnoredFiles()
+
         val response = client.newCall(
-            buildRequest("http://localhost:8000/init",
-                buildMultipartBody(MultipartBody.FORM,
-                    getFilesToSend()))).execute()
-        if(!response.isSuccessful) {
+            buildRequest(
+                "http://localhost:8000/init",
+                buildMultipartBody(
+                    MultipartBody.FORM,
+                    getFilesToSend(ignoredFiles)
+                )
+            )
+        ).execute()
+
+        if (!response.isSuccessful) {
             println("Failed to initialise repository!")
         }
         Path("$dir/.headchef").createFile()
         println("Repository initialised successfully!")
-        }
+    }
 
     private fun buildMultipartBody(type: MediaType, filesToSend: List<File>): MultipartBody {
         val multipartBuilder = MultipartBody.Builder()
@@ -52,23 +58,16 @@ class InitialiseCommand : Runnable {
         return multipartBuilder.build()
     }
 
-    private fun buildRequest(url: String, body: RequestBody): Request{
+    private fun buildRequest(url: String, body: RequestBody): Request {
         return Request.Builder()
             .url(url)
             .post(body)
             .build()
     }
 
-    private fun getFilesToSend(): List<File> {
-        val ignoreFilePath = Path("$dir/.headchefignore")
-        val ignoreFile = if (ignoreFilePath.exists()) { ignoreFilePath.toFile() } else { ignoreFilePath.createFile().toFile() }
-        val ignoreSet = ignoreFile.readLines()
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .toSet()
-
+    private fun getFilesToSend(ignoredFiles: Set<String>): List<File> {
         return FileScanner.getFiles()
-            .filter { file -> file.name !in ignoreSet }
+            .filter { file -> file.name !in FileScanner.getIgnoredFiles() }
     }
 
     private fun ensureNotInitialised(): Boolean {
