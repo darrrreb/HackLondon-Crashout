@@ -1,6 +1,6 @@
 # HackLondon 2025
 
-Project Name: ForkIt
+Project Name: HEAD Chef
 
 Team Name: Crashout
 
