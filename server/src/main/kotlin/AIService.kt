@@ -1,6 +1,5 @@
 package crashout
 import com.openai.client.okhttp.OpenAIOkHttpClient
-import com.openai.models.ChatCompletion
 import com.openai.models.ChatCompletionCreateParams
 import com.openai.models.ChatModel
 
