@@ -1,6 +1,8 @@
 package commands
 
 import FileScanner
+import Hasher
+import LocalRepository
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.createFile
@@ -26,13 +28,13 @@ class InitialiseCommand : Runnable {
         }
 
         val ignoredFiles = FileScanner.getIgnoredFiles()
-
+        val newFiles = getFilesToSend(ignoredFiles)
         val response = client.newCall(
             buildRequest(
                 "http://localhost:8000/init",
                 buildMultipartBody(
                     MultipartBody.FORM,
-                    getFilesToSend(ignoredFiles)
+                    newFiles
                 )
             )
         ).execute()
@@ -40,8 +42,16 @@ class InitialiseCommand : Runnable {
         if (!response.isSuccessful) {
             println("Failed to initialise repository!")
         }
+
         Path("$dir/.headchef").createFile()
+        val entries = getLocalNameHashPairs(newFiles, ignoredFiles)
+        entries.forEach {LocalRepository.newEntry(it.first, it.second)}
+        LocalRepository.writeToFile()
         println("Repository initialised successfully!")
+    }
+
+    private fun getLocalNameHashPairs(files: List<File>, ignoredFiles: Set<String>): List<Pair<String, String>> {
+        return Hasher.hashAllFiles(files, ignoredFiles)
     }
 
     private fun buildMultipartBody(type: MediaType, filesToSend: List<File>): MultipartBody {

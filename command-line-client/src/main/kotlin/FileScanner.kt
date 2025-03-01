@@ -12,11 +12,11 @@ import kotlin.io.path.walk
 object FileScanner {
     private val dir: String = System.getProperty("user.dir")
 
-     fun getFiles(): List<File> {
+     fun getFiles(): Set<File>{
         return Path(dir)
             .listDirectoryEntries()
             .filter { path -> path.toFile().isFile }
-            .map { path -> path.toFile() }
+            .map { path -> path.toFile() }.toSet()
     }
 
     fun getIgnoredFiles(): Set<String> {

@@ -12,7 +12,7 @@ object Hasher {
    /**
     *  Hashes all files in a list and returns a list of pairs of file names and their respective hashes
     */
-    fun hashAllFiles(files: List<File>, ignoredFiles: Set<String>): List<Pair<String, String>> {
+    fun hashAllFiles(files: Set<File>, ignoredFiles: Set<String>): List<Pair<String, String>> {
         return files.filter { it.name !in ignoredFiles }.map { Pair(it.name, hash(it.readBytes())) }
     }
 }

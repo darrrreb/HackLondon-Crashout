@@ -1,7 +1,7 @@
 import java.io.File
 import kotlin.io.path.Path
 
-class LocalRepository {
+object LocalRepository {
     val table: MutableList<Entry> = mutableListOf()
 
     fun newEntry(name: String, hash: String){
@@ -10,6 +10,14 @@ class LocalRepository {
 
     fun getEntry(hash: String): Entry? {
         return table.find { it.hash == hash }
+    }
+
+    fun getEntryByName(name: String): Entry? {
+        return table.find { it.name == name }
+    }
+
+    fun getAllEntryNames(): List<String> {
+        return table.map { it.name }
     }
 
     fun isValidEntry(hash: String): Boolean {
