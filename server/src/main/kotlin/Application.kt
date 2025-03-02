@@ -1,15 +1,29 @@
 package crashout
 
+import aws.sdk.kotlin.services.sts.StsClient
 import io.ktor.server.application.*
+import java.io.File
 import java.security.MessageDigest
 import java.time.Instant
+import kcl.seg.rtt.utils.aws.S3Manager
+import kcl.seg.rtt.utils.aws.S3Service
 import kotlinx.serialization.Serializable
 import kotlin.collections.plus
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 
 fun Application.module() {
     configureRouting()
-    println(AIService.longMessage("Generate a sample response for this prompt."))
+    val json = readJsonFile("src/main/resources/s3config.json")
+    println(json)
+    S3Service.init(S3Manager(json["s3"]!!.jsonObject, StsClient {region = "eu-west-2"}))
+}
+
+fun readJsonFile(path: String): JsonObject {
+    val file = File(path)
+    val content: String = file.readText()
+    return Json.parseToJsonElement(content).jsonObject
 }
 
 @Serializable

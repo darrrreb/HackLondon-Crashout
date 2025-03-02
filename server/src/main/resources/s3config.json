@@ -1,0 +1,7 @@
+{
+  "s3": {
+    "role": "arn:aws:iam::977098998083:role/S3SafeRole",
+    "buckets": [],
+    "region": "eu-west-2"
+  }
+}

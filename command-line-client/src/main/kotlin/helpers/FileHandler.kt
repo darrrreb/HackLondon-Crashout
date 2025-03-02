@@ -1,5 +1,6 @@
+package helpers
+
 import java.io.File
-import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
