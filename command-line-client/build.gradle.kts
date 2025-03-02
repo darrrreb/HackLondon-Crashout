@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven ("https://jitpack.io")
 }
 
 dependencies {
@@ -16,6 +17,7 @@ dependencies {
     implementation("info.picocli:picocli:4.7.1")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
+    implementation ("com.github.kotlin-inquirer:kotlin-inquirer:0.1.0")
     testImplementation(kotlin("test"))
 }
 
