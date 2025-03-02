@@ -22,7 +22,9 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-server-cors:3.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("io.ktor:ktor-server-content-negotiation:3.1.1")
     implementation("aws.sdk.kotlin:s3:1.4.11")
     implementation("aws.sdk.kotlin:sts:1.4.11")
     implementation("com.openai:openai-java:0.30.0")

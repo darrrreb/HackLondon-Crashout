@@ -43,18 +43,9 @@ class CookCommand : Runnable {
        Path("${System.getProperty("user.dir")}/.headchef/repo.crashout").createFile()
 
         println("Cooking up a storm!")
-       // println( File("${System.getProperty("user.dir")}/.headchef/repo.crashout").readText())
 
         val newStateFiles = FileHandler.getFiles()
         val newStateHashes = Hasher.hashAllFiles(newStateFiles, ignoredFilesNames)
-
-        println(oldEntryNames)
-        println(ignoredFilesNames)
-        println(currentState)
-        println(newStateHashes)
-        println(newStateFiles)
-        println("=====================================")
-
 
         val list1: MutableList<File> = mutableListOf()
         val list2: MutableList<File> = mutableListOf()
@@ -72,12 +63,7 @@ class CookCommand : Runnable {
                 list1.add(newStateFiles.getByName(pair.first)!!)}
 
 
-            print("T")
         }
-
-        println(oldEntryNames)
-        println(newStateHashes)
-        println("=====================================")
         oldEntryNames.filter { it !in newStateHashes.map { it.first } }.onEach { name ->
             currentState.getByName(name)
                 ?.let {
@@ -88,7 +74,6 @@ class CookCommand : Runnable {
         }
 
         list1.forEach { println(it.name) }
-        println("SKIBDIIIIII")
         list2.forEach { println(it.name) }
 
 

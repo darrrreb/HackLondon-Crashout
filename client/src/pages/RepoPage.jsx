@@ -79,14 +79,20 @@ const Flow = () => {
   const handleClose = () => setShow(false);
 
   useEffect(() => {
-    setSteps(STEPS);
-    addGraph(steps);
-  }, [STEPS, steps]);
+    axios.get("http://localhost:8080/api/steps/demo")
+        .then((response) => {
+          const byteArrays = response.data.map((step) => new Uint8Array(step));
+          const jsonStrings = byteArrays.map((byteArray) => new TextDecoder().decode(byteArray));
+          const jsonObjects = jsonStrings.map((jsonString) => JSON.parse(jsonString));
+          console.log(jsonObjects);
+          setSteps(jsonObjects.reverse());
+        })
+    //setSteps(STEPS);
+    addGraph();
+  }, [steps]);
 
-  const addGraph = (newSteps) => {
-    console.log("steps", steps);
+  const addGraph = () => {
     const { nodes: rawNodes, edges: rawEdges } = createNodesFromSteps(steps);
-    console.log("raw nodes", rawNodes);
 
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       rawNodes,
@@ -96,13 +102,16 @@ const Flow = () => {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
   }
-
+/*
   const getSteps = async () => {
-    await axios.get("localhost:8080/cookbook/")
-      .then(response => {
-        setSteps(response.data);
-      })
-  }
+    try {
+      await axios.get("http://localhost:8080/api/steps/demo")
+          .then(response => {
+            console.log(response.data)
+            setSteps(response.data);
+          })
+    } catch (e) { console.log(e)}
+  }*/
 
   const handleNavigation = () => {
     navigate('/');
@@ -114,9 +123,7 @@ const Flow = () => {
     handleShow();
   }
 
-  const [clickedNodes, setClickedNodes] = useState([]);
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleMerge = async (event, node) => {
     setNodes((nds) => nds.map((n) => n.id === node.id ? { ...n, style: { ...n.style, backgroundColor: '#5b2323' } } : n));
@@ -134,11 +141,11 @@ const Flow = () => {
 
   const executeMerge = (node, sha2) => {
     setNodes((nds) => nds.map((n) => ({ ...n, style: { ...n.style, backgroundColor: '#a14949' } })));
-    axios.post("http://localhost:8080/merge/" + sha1 + "/" + sha2, {})
-      .then(response => {
-        getSteps();  // Fetch updated steps after merge
-      })
-      .catch(error => console.error("Merge error:", error));
+    // axios.post("http://localhost:8080/merge/" + sha1 + "/" + sha2, {})
+    //   .then(response => {
+    //     getSteps();  // Fetch updated steps after merge
+    //   })
+    //   .catch(error => console.error("Merge error:", error));
     setSha1("");  // Reset selected SHA
   };
 

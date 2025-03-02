@@ -87,7 +87,7 @@ export const createNodesFromSteps = (steps) => {
     idCounter += 1;  // Increment ID counter for the next node
 
     // Create edges to each child node recursively
-    step.children.forEach((childSha) => {
+    step.childrenSha.forEach((childSha) => {
       // Ensure the child node exists or is created
       if (!shaToIdMap.has(childSha) && !visited.has(childSha)) {
         visited.add(childSha);

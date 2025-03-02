@@ -20,7 +20,11 @@ import kotlin.io.path.Path
 import kotlin.io.path.deleteIfExists
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.decodeFromString
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
 
 fun Application.configureRouting() {
     routing {
@@ -68,23 +72,31 @@ fun Route.configureMainRoute() {
             call.parameters["name"] ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing cookbook name!")
         val sha = call.parameters["sha"] ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing SHA!")
         val parentSha = call.parameters["parentSha"]?.split(",") ?: emptyList()
-
-
         val diff = call.receive<ByteArray>()
         val diffFile = File.createTempFile("temp", "")
             diffFile.writeBytes(diff)
         S3Service.uploadFile("hl2025-cookbook-$name", diffFile, "diffs/$sha.diff")
         diffFile.delete()
-        val shortMessage = "ASDAWSD" //AIService.shortMessage(String(diff))
-        val longMessage = "ASDASD" //AIService.longMessage(String(diff))
+        val shortMessage = AIService.shortMessage(String(diff))
+        val longMessage = AIService.longMessage(String(diff))
         createStep(sha, parentSha, emptyList(),  shortMessage, longMessage, name)
+
+        val parent = S3Service.getFile("hl2025-cookbook-$name", "steps/$parentSha.json")
+        val parentString = String(parent)
+        val decoded = Json.decodeFromString<JsonObject>(parentString)
+        decoded.get("childrenSha")?.jsonArray?.plus(sha)
+        val temp = File.createTempFile("temp", ".json")
+        temp.writeBytes(Json.encodeToString<JsonObject>(decoded).toByteArray())
+        S3Service.uploadFile("hl2025-cookbook-$name", temp, "steps/$parentSha.json")
+        temp.delete()
+
         call.respond(HttpStatusCode.OK, "Step created successfully")
     }
 
     get("/api/steps/{repoName}"){
         val repoName = call.parameters["repoName"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing repo name!")
-        val steps = S3Service.downloadDirectory(repoName, "steps")
-        call.respond(HttpStatusCode.OK, Json.encodeToString(steps))
+        val steps = S3Service.downloadDirectory("hl2025-cookbook-$repoName", "steps/")
+        call.respond(HttpStatusCode.OK, steps.map { it.readBytes() })
     }
 
 }

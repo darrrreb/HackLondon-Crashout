@@ -1,7 +1,10 @@
 package crashout
 
 import aws.sdk.kotlin.services.sts.StsClient
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
 import java.io.File
 import java.security.MessageDigest
 import java.time.Instant
@@ -14,6 +17,14 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
 fun Application.module() {
+    install(CORS){
+        anyMethod()
+        anyHost()
+        allowCredentials = true
+    }
+    install(ContentNegotiation) {
+        json()
+    }
     configureRouting()
     val json = readJsonFile("src/main/resources/s3config.json")
     S3Service.init(S3Manager(json["s3"]!!.jsonObject, StsClient {region = "eu-west-2"}))

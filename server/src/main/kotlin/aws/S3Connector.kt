@@ -211,16 +211,12 @@ object S3Service {
             this.bucket = bucketName
             this.prefix = prefixKey
         }
-        val filesInDir = s3client.listObjectsV2(request).contents?.mapNotNull { it.key } ?: emptyList()
-        return filesInDir.map { fileName ->
-            File(Path(".work/tmp/$prefixKey", fileName).toString()).also {
-                it.writeBytes(
-                    getFile(
-                        bucketName,
-                        "$prefixKey/$fileName"
-                    )
-                )
-            }
+        val filesInDir = s3client.listObjectsV2(request).contents?.mapNotNull { it.key.also { println(it) } } ?: emptyList()
+        val contents = filesInDir.map { file -> getFile(bucketName, file) }
+        return contents.mapIndexed { index, content ->
+            val file = File.createTempFile("temp", "")
+            file.writeBytes(content)
+            file
         }
     }
 }
