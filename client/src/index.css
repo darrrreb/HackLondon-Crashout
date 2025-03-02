@@ -1,21 +1,182 @@
+@font-face {
+  font-family: 'Garet';
+  font-style: normal;
+  font-weight: 300;
+  src: url('https://fonts.cdnfonts.com/s/57477/Garet-Book.woff2') format('woff2'),
+  url('https://fonts.cdnfonts.com/s/57477/Garet-Book.woff') format('woff'),
+  url('https://fonts.cdnfonts.com/s/57477/Garet-Book.ttf') format('truetype');
+}
+
+
 :root {
   --light-color: #000000;
+  --bs-font-sans-serif: 'Garet';
 }
 
 body {
-  background-image: url('');
+  background-image: url('./assets/images/bg-img.png');
   min-height: 100vh;
   width: 100vw;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-  sans-serif;
-  text-align: center;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: white;
+  max-width: 100vw;
+  font-family: 'Garet', sans-serif;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 5em;
+  padding-right: 5em;
+  padding-bottom: 5em;
+  margin-top: 3em;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-  monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+h3 {
+  font-weight: bold;
+}
+
+.navbar {
+  padding-left: 0;
+  padding-right: 0;
+  font-weight: bold;
+}
+
+.navbar > .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.navbar-brand {
+  font-size: 2rem; /* Adjust as needed */
+}
+
+.nav-link, .nav-dropdown {
+  font-size: 1.10rem; /* Adjust as needed */
+}
+
+.main-heading {
+  margin-bottom: 0;
+  color: white;
+  line-height: 32px;
+  font-weight: bold;
+}
+
+.btn {
+  background-color: transparent;
+  border-color: transparent;
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-border-color: transparent;
+}
+
+button {
+  background-color: #ffbd59;
+  color: #5b2323;
+  border: 0;
+  border-radius: 30px;
+  padding: 0.75rem 2rem 0.75rem 2rem;
+  font-weight: bold;
+}
+
+.icon-heading-container {
+  margin-top: 5%;
+  margin-bottom: 2%;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  vertical-align: middle;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.space {
+  height: 10vh;
+}
+
+.icon-repo-container {
+  margin-top: 2%;
+  margin-bottom: 2%;
+  display: flex;
+  align-items: center;
+}
+
+.repository-item {
+  cursor: pointer;
+}
+
+.react-flow {
+  --xy-minimap-node-background-color-default: #a14949;
+  --xy-minimap-background-color-default: #ffdeac;
+  --xy-minimap-mask-background-color-default: rgb(255, 189, 89, 0.6);
+}
+
+.react-flow__panel {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 0 5rem;
+}
+
+.react-flow__attribution {
+  background: none;
+  font-size: 0;
+}
+
+.react-flow__controls {
+  margin: 2rem;
+  box-shadow: none;
+}
+
+.react-flow__controls-button {
+  background-color: #ffbd59;
+  color: #5b2323;
+}
+
+.react-flow__minimap {
+  margin: 2rem;
+  border-radius: 30px;
+}
+
+.react-flow__minimap-svg {
+  border-radius: 30px;
+}
+
+.react-flow__node-default {
+  border-radius: 30px;
+  border: 0;
+  background-color: #a14949;
+  color: white;
+}
+
+.react-flow__handle {
+  border: 0;
+  background-color: #ffbd59;
+}
+
+.react-flow__edge-path {
+  stroke: #5b2323;
+}
+
+.modal-header {
+  border-width: 0px;
+}
+
+.modal-body {
+  border-width: 0px;
+}
+
+.modal-footer {
+  border-width: 0px;
+}
+
+.modal-content {
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  background-color: #5b2323;
+  color: white;
 }
