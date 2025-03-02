@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   Background,
   ReactFlow,
@@ -64,6 +64,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 );
 
 const Flow = () => {
+  const [steps, setSteps] = useState([]);
   const [merge, setMerge] = useState(false);
   const [sha1, setSha1] = useState("");
   const [show, setShow] = useState(false);
@@ -72,6 +73,17 @@ const Flow = () => {
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
+
+  useEffect (() => {
+    //getSteps();
+  }, [])
+
+  const getSteps = async () => {
+    await axios.get("localhost:8080/cookbook/")
+      .then(response => {
+        setSteps(response.data);
+      })
+  }
 
   const handleNavigation = () => {
     navigate('/');
@@ -96,8 +108,10 @@ const Flow = () => {
   }
 
   const executeMerge = (sha2) => {
-    //axios with sha1 and sha2
-    console.log(sha1 + " " + sha2);
+    axios.post("localhost:8080/merge/" + sha1 + "/" + sha2, {})
+      .then(response => {
+        getSteps();
+      })
     setSha1("");
   }
 
