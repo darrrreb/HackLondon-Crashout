@@ -1,28 +1,34 @@
 package commands
 
-import FileHandler
-import Hasher
-import LocalRepository
-import RemoteInteraction
+import helpers.FileHandler
+import helpers.Hasher
+import helpers.LocalRepository
+import helpers.RemoteInteraction
 import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptConfirm
+import helpers.JsonInteraction
 import java.io.File
+import java.security.MessageDigest
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.jsonObject
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import picocli.CommandLine
 import picocli.CommandLine.Command
 
 @Command(name = "prep", description = ["Initialise a new repository"])
 class InitialiseCommand : Runnable {
-    val client by lazy { OkHttpClient.Builder().build() }
+    @CommandLine.Parameters(index = "0", paramLabel = "<name>", description = ["Name of a cookbook"])
+    lateinit var repoName: String
     val dir = System.getProperty("user.dir")
 
     override fun run() {
@@ -33,18 +39,27 @@ class InitialiseCommand : Runnable {
 
         val ignoreFilePath = Path("$dir/.headchefignore")
         if (!ignoreFilePath.exists()) {
-            val abort: Boolean = KInquirer.promptConfirm(message = "No .chefignorefile found? Continue with a blank one ?", default = false)
+            val abort: Boolean = KInquirer.promptConfirm(
+                message = "No .chefignorefile found? Continue with a blank one ?",
+                default = false
+            )
             if (abort) {
                 return
             }
         }
 
+        // Write the repo name to the config file. Since this is an initialisation, the parentSha is null.
+        JsonInteraction.writeJson(
+            "src/main/resources/config.json",
+            Json.parseToJsonElement("{ \"repoName\":\"$repoName\", \"parentSha\":\"${JsonNull}\"}").jsonObject
+        )
+
         val files = FileHandler.getFiles()
         val ignoredFileNames = FileHandler.getIgnoredFilesNames()
         val fileChanges = getFilesToSend(files, ignoredFileNames)
-        handleLocal(fileChanges, ignoredFileNames)
-        if (handleRemote(fileChanges).isSuccessful) {
 
+        if (handleRemote(fileChanges).isSuccessful) {
+            handleLocal(fileChanges, ignoredFileNames)
             println("Repository initialised successfully!")
         } else {
             println("Failed to initialise repository")
@@ -61,14 +76,18 @@ class InitialiseCommand : Runnable {
     }
 
     private fun handleRemote(fileChanges: Set<File>): okhttp3.Response {
-        return RemoteInteraction.sendRequestToRemote(buildRequest(
-            "http://localhost:8000/init",
-            buildMultipartBody(
-                MultipartBody.FORM,
-                fileChanges
+        return RemoteInteraction.sendRequestToRemote(
+            buildRequest(
+                "http://localhost:8000/init/$repoName/${Hasher.sha(fileChanges.toList())}",
+                buildMultipartBody(
+                    MultipartBody.FORM,
+                    fileChanges
+                )
             )
-        ))
+        )
     }
+
+
 
     private fun getLocalNameHashPairs(
         files: Set<File>,

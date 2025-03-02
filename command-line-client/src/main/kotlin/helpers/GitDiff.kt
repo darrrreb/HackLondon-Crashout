@@ -5,9 +5,9 @@ import java.io.BufferedWriter
 import java.io.FileWriter
 
 object GitDiff {
-    fun generateDiffFile(oldList: List<File>, newList: List<File>, path: String) {
+    fun generateDiffFile(oldList: List<File>, newList: List<File>, path: String, sha: String) {
         val difference = generateDiff(oldList, newList)
-        BufferedWriter(FileWriter(path + "diff")).use { writer ->
+        BufferedWriter(FileWriter(path + sha)).use { writer ->
             for (i in difference.indices) {
                 writer.write(difference[i].fileName)
                 writer.write("======")
