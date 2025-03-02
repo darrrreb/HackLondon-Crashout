@@ -56,24 +56,60 @@ object GitDiff {
         // returns a success or fail msg
     }
 
-    fun getDiffs(fromSha: String) {
-        // Work back through the tree of steps to get list
-        // Reverse Lists
-        // Get the diffs of every step through time
+    fun getDiffs(fromSha: String) : List<File>{
+        // val step = getStep(fromSha)
+        // step.parents[0].addToList
+        // step.parents[0].parents[0].addToList
+        // etc.
+        // Reverse List
+        // Get the diffs of every step through the reversed list
+        return emptyList()
     }
 
-    fun merge() {
-        // handles merging somehow I D E K how
+    fun merge(sha1: String, sha2: String) {
+        val listOfDiffs1 = getDiffs(sha1)
+        val listOfDiffs2 = getDiffs(sha2)
+        val longerList = maxOf(listOfDiffs1, listOfDiffs2, compareBy { it.size })
+        val str = applyAllDiffs(longerList, "tmp/")
+        if (str == "") {
+            applyAllDiffs(listOfDiffs1, "tmp2/")
+            generateDiffFile(getFiles("tmp2"), getFiles("tmp"), "tmp/")
+        } else {
+            applyAllDiffs(listOfDiffs1, "tmp/" + str)
+            applyAllDiffs(listOfDiffs2, "tmp2/" + str)
+            // ASK CHATGPT TO TOUCH it AND put that in tmp
+            val gptFile : File
+            applyAllDiffs(listOfDiffs1, "tmp2/")
+            generateDiffFile(getFiles("tmp2"), getFiles("tmp"), "tmp3/")
+        }
+        //Diff file in tmp3 goes into merge commit
     }
 
-    fun applyAllDiffs(diffList: List<File>, path: String) {
+    fun getFiles(directoryPath: String): List<File> {
+        val directory = File(directoryPath)
+        if (directory.exists() && directory.isDirectory) {
+            return directory.listFiles()?.filter { it.isFile }?.toList() ?: emptyList()
+        }
+        return emptyList()
+    }
+
+    fun applyAllDiffs(diffList: List<File>, directoryPath: String) : String {
+        val directory = File(directoryPath)
+        if (directory.exists() && directory.isDirectory) {
+            directory.listFiles()?.forEach { file ->
+                file.delete();
+            }
+        }
+
         for (diff in diffList) {
             var fileList = listOf<File>() //get all files in a place - perhaps clone initial files into a file to work with?
-            parseApplyDiff(fileList, path, diff)
+            val str = parseApplyDiff(fileList, directoryPath, diff)
+            if (str == "") { return "" } else { return str }
         }
+        return ""
     }
 
-    fun parseApplyDiff(fileList: List<File>, path: String, diffFile: File) {
+    fun parseApplyDiff(fileList: List<File>, path: String, diffFile: File) : String {
         val files = fileList
         val diffs = diffFile.readLines().joinToString(separator = " ").split("=======")
         for (diff in diffs) {
@@ -81,8 +117,10 @@ object GitDiff {
             for (i in files.indices) {
                 if (files[i].name == keys[0]) {
                     if (keys[1].toInt() == 0) {
-                        val fileString = (DiffUtils.patch(files[i].readLines(), UnifiedDiffUtils.parseUnifiedDiff(keys[2].replace("!====!", "\n").split("\n"))).joinToString("\n"))
-                        File(path + keys[0]).writeText(fileString)
+                        try {
+                            val fileString = (DiffUtils.patch(files[i].readLines(), UnifiedDiffUtils.parseUnifiedDiff(keys[2].replace("!====!", "\n").split("\n"))).joinToString("\n"))
+                            File(path + keys[0]).writeText(fileString)
+                        } catch (e : Exception) { return files[i].name }
                     }
                     else if (keys[1].toInt() == 1) {
                         files[i].delete()
@@ -94,6 +132,7 @@ object GitDiff {
                 File(path + keys[0]).writeText(fileString)
             }
         }
+        return ""
     }
 
     data class Diff(
