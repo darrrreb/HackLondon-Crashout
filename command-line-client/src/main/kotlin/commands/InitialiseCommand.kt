@@ -5,6 +5,7 @@ import Hasher
 import LocalRepository
 import java.io.File
 import kotlin.io.path.Path
+import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
@@ -24,37 +25,42 @@ class InitialiseCommand : Runnable {
 
     override fun run() {
         if (!ensureNotInitialised()) {
-            return
+            return //Exit if already initialised
         }
-
-        val ignoredFiles = FileScanner.getIgnoredFiles()
-        val newFiles = getFilesToSend(ignoredFiles)
-        val response = client.newCall(
-            buildRequest(
-                "http://localhost:8000/init",
-                buildMultipartBody(
-                    MultipartBody.FORM,
-                    newFiles
-                )
-            )
-        ).execute()
-
-        if (!response.isSuccessful) {
-            println("Failed to initialise repository!")
+        val files = FileScanner.getFiles()
+        val ignoredFileNames = FileScanner.getIgnoredFilesNames()
+        val fileChanges = getFilesToSend(files, ignoredFileNames)
+        if (handleRemote(fileChanges).isSuccessful){
+            handleLocal(fileChanges, ignoredFileNames)
+            println("Repository initialised successfully!")
+        } else {
+            println("Failed to initialise repository")
         }
+    }
 
-        Path("$dir/.headchef").createFile()
-        val entries = getLocalNameHashPairs(newFiles, ignoredFiles)
+    private fun handleLocal(newFiles: Set<File>, ignoredFileNames: Set<String>) {
+        Path("$dir/.headchef").createDirectory()
+        Path("$dir/.headchef", "repo.crashout").createFile()
+        val entries = getLocalNameHashPairs(newFiles, ignoredFileNames)
         entries.forEach {LocalRepository.newEntry(it.first, it.second)}
         LocalRepository.writeToFile()
-        println("Repository initialised successfully!")
     }
 
-    private fun getLocalNameHashPairs(files: List<File>, ignoredFiles: Set<String>): List<Pair<String, String>> {
-        return Hasher.hashAllFiles(files, ignoredFiles)
+    private fun handleRemote(fileChanges: Set<File>): okhttp3.Response {
+        return client.newCall(
+                buildRequest(
+                    "http://localhost:8000/init",
+                    buildMultipartBody(
+                        MultipartBody.FORM,
+                        fileChanges
+                    )
+                )
+                ).execute()
     }
 
-    private fun buildMultipartBody(type: MediaType, filesToSend: List<File>): MultipartBody {
+    private fun getLocalNameHashPairs(files: Set<File>, ignoredFiles: Set<String>): List<Pair<String, String>> = Hasher.hashAllFiles(files, ignoredFiles)
+
+    private fun buildMultipartBody(type: MediaType, filesToSend: Set<File>): MultipartBody {
         val multipartBuilder = MultipartBody.Builder()
             .setType(type)
 
@@ -75,9 +81,11 @@ class InitialiseCommand : Runnable {
             .build()
     }
 
-    private fun getFilesToSend(ignoredFiles: Set<String>): List<File> {
-        return FileScanner.getFiles()
-            .filter { file -> file.name !in FileScanner.getIgnoredFiles() }
+
+
+    private fun getFilesToSend(files: Set<File>, ignoredFiles: Set<String>): Set<File> {
+        return files
+            .filter { file -> file.name !in ignoredFiles }.toSet()
     }
 
     private fun ensureNotInitialised(): Boolean {

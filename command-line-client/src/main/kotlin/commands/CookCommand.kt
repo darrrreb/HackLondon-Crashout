@@ -10,13 +10,13 @@ import picocli.CommandLine.Command
 @Command(name = "cook", description = ["Prepares files and sends them to the kitchen"], mixinStandardHelpOptions = true,)
 class CookCommand : Runnable {
     override fun run() {
-        LocalRepository.load()
+        LocalRepository.loadFromFile()
         println("Cooking up a storm!")
 
         //LIST1: Old and deleted files
         //LIST2: New and modified files
         val files = FileScanner.getFiles()
-        val ignoredFiles = FileScanner.getIgnoredFiles()
+        val ignoredFiles = FileScanner.getIgnoredFilesNames()
         //val previousState = GET FROM REMOTE
         val currentState = Hasher.hashAllFiles(files, ignoredFiles)
         val deletedFileNames = LocalRepository.getAllEntryNames().filter { name -> name !in currentState.map { it.first } }
