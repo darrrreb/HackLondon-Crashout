@@ -49,11 +49,11 @@ export const initialEdges = [
 ];
 
 export const STEPS = [
-  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVKBJLksldfjlsdkfj', shortMessage: "Add feature a", summary:"Test summary!!", children: ['ABClsdkfs'] },
-  { sha: 'ABClsdkfs', shortMessage: "Add feature b", summary:"Test summary!!", children: ['HTGBNCKSLKDFJLSK', 'GGTY498324fsdlkjf'] },
-  { sha: 'HTGBNCKSLKDFJLSK', shortMessage: "Add feature c", summary:"Test summary!!", children: [] },
-  { sha: 'GGTY498324fsdlkjf', shortMessage: "Add feature d", summary:"Test summary!!", children: [] },
-  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVebgds', shortMessage: "Add feature z", summary:"Test summary!!", children: ['ABClsdkfs'] },
+  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVKBJLksldfjlsdkfj', shortMessage: "Add feature a", summary:"Test summary!!", childrenSha: ['ABClsdkfs'] },
+  { sha: 'ABClsdkfs', shortMessage: "Add feature b", summary:"Test summary!!", childrenSha: ['HTGBNCKSLKDFJLSK', 'GGTY498324fsdlkjf'] },
+  { sha: 'HTGBNCKSLKDFJLSK', shortMessage: "Add feature c", summary:"Test summary!!", childrenSha: [] },
+  { sha: 'GGTY498324fsdlkjf', shortMessage: "Add feature d", summary:"Test summary!!", childrenSha: [] },
+  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVebgds', shortMessage: "Add feature z", summary:"Test summary!!", childrenSha: ['ABClsdkfs'] },
 ]
 
 export const createNodesFromSteps = (steps) => {
