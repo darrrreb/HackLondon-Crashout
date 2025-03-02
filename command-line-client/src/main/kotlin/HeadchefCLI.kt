@@ -13,7 +13,6 @@ class HeadchefCLI : Runnable{
     }
 }
 
-
 fun main(args: Array<String>) {
     CommandLine(HeadchefCLI()).execute(*args)
 }

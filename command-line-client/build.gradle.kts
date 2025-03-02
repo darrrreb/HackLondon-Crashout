@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.10"
     kotlin("plugin.serialization") version "1.6.0"
+    application
 }
 
 group = "kcl.seg.rtt"
@@ -20,6 +21,16 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+application {
+    mainClass.set("HeadchefCLI")
+}
+
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
 }
 kotlin {
     jvmToolchain(21)

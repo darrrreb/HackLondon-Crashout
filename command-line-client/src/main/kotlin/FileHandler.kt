@@ -41,7 +41,6 @@ object FileHandler {
         return true
     }
 
-
     fun getCurrentState(cloneDir: String): Set<File> {
         return Path(cloneDir)
             .listDirectoryEntries()

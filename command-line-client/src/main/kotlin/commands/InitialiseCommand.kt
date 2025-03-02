@@ -31,9 +31,8 @@ class InitialiseCommand : Runnable {
         val files = FileHandler.getFiles()
         val ignoredFileNames = FileHandler.getIgnoredFilesNames()
         val fileChanges = getFilesToSend(files, ignoredFileNames)
-        handleLocal(fileChanges, ignoredFileNames)
         if (handleRemote(fileChanges).isSuccessful) {
-
+            handleLocal(fileChanges, ignoredFileNames)
             println("Repository initialised successfully!")
         } else {
             println("Failed to initialise repository")
