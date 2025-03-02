@@ -6,14 +6,11 @@ const Navigation = () => {
 
     return (
         <Navbar data-bs-theme="dark">
-            <Container>
+            <Container fluid>
                 <Navbar.Brand href="/">&#62;&#62;&#62; HEAD Chef</Navbar.Brand>
                 <Navbar.Toggle />
                 <Navbar.Collapse className="justify-content-end">
                     <Nav>
-                        <Nav.Link >
-                            <GearWideConnected size={25} />
-                        </Nav.Link>
                         <NavDropdown title="Settings" id="basic-nav-dropdown">
                             <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
                             <NavDropdown.Item href="#action/3.2">
@@ -25,6 +22,10 @@ const Navigation = () => {
                                 Help
                             </NavDropdown.Item>
                         </NavDropdown>
+                        <Nav.Link>
+                            <GearWideConnected size={25} />
+                        </Nav.Link>
+
                     </Nav>
                 </Navbar.Collapse>
             </Container>
