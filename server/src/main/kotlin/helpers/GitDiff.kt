@@ -23,10 +23,47 @@ object GitDiff {
         }
     }
 
+    fun receiveStep() {
+        // Step should be sent as diff, repoName, parentCommit, sha
+        // Take parent commit and add this commit to its children list
+        // generate the relevant ai thingies
+        // create a step object
+        // put it in the cuhloud
+    }
+
+    fun receiveInit() {
+        // Will receive: Lots of files, repoName
+        // Make bucket
+        // put stuff in bucket
+        // success
+    }
+
+    fun receivePull() {
+        // Will receive: one SHA
+        // Will return all files at this commit
+        // Using getDiffs/Applyalldiffs
+    }
+
+    fun sendTreeToFrontend() {
+        // Receives a repo name
+        // Should return the full list of commits from here
+        // Data expected by the front end: Steps(SHA, ShortMessage, [childrenSHAs])
+    }
+
+    fun receiveMergeRequestFromFrontEnd() {
+        // Receives 2 commit SHAs
+        // merges dem ones dere
+        // returns a success or fail msg
+    }
+
     fun getDiffs(fromSha: String) {
         // Work back through the tree of steps to get list
         // Reverse Lists
         // Get the diffs of every step through time
+    }
+
+    fun merge() {
+        // handles merging somehow I D E K how
     }
 
     fun applyAllDiffs(diffList: List<File>, path: String) {
