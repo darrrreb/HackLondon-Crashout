@@ -21,6 +21,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 import java.nio.file.Files
+import kotlin.io.path.Path
 
 data class ConfiguredS3Client(
     val s3Client: S3Client,
@@ -134,7 +135,7 @@ object S3Service {
     suspend fun getFile(
         bucketName: String,
         key: String,
-    ): String {
+    ): ByteArray {
         val request =
             GetObjectRequest {
                 this.bucket = bucketName
@@ -142,7 +143,7 @@ object S3Service {
             }
         ensureClient()
         return s3client.getObject(request) { response ->
-            response.body?.decodeToString().toString()
+            response.body?.decodeToString()?.toByteArray() ?: byteArrayOf()
         }
     }
 
@@ -201,6 +202,25 @@ object S3Service {
         }
         s3client.deleteBucket(request).also {
             return true
+        }
+    }
+
+    suspend fun downloadDirectory(bucketName: String, prefixKey: String): List<File> {
+        ensureClient()
+        val request = ListObjectsV2Request {
+            this.bucket = bucketName
+            this.prefix = prefixKey
+        }
+        val filesInDir = s3client.listObjectsV2(request).contents?.mapNotNull { it.key } ?: emptyList()
+        return filesInDir.map { fileName ->
+            File(Path(".work/tmp/$prefixKey", fileName).toString()).also {
+                it.writeBytes(
+                    getFile(
+                        bucketName,
+                        "$prefixKey/$fileName"
+                    )
+                )
+            }
         }
     }
 }

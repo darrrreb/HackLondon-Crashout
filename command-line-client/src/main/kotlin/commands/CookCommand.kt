@@ -9,7 +9,8 @@ import helpers.RemoteInteraction
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.deleteIfExists
-import kotlin.math.max
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -18,6 +19,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import picocli.CommandLine.Command
+import picocli.CommandLine.call
 
 @Command(name = "cook", description = ["Prepares files and sends them to the kitchen"], mixinStandardHelpOptions = true,)
 class CookCommand : Runnable {
@@ -39,10 +41,10 @@ class CookCommand : Runnable {
             entry?.let {
                 if (entry.hash != pair.second) {
                     LocalRepository.removeEntry(entry.hash)
+                    list1.add(newStateFiles.getByName(pair.first)!!)
                 }
             }
             LocalRepository.newEntry(pair.first, pair.second)
-            list1.add(newStateFiles.getByName(pair.first)!!)
         }
 
         list2.addAll(newStateFiles.filter { it.name in deletedFileNames})
@@ -52,15 +54,22 @@ class CookCommand : Runnable {
         generateDiffFile(list1, list2, "${System.getProperty("user.dir")}/.headchef/tmp/", sha)
 
         val repoName = JsonInteraction.readJson("src/main/resources/config.json")!!["repoName"]!!.jsonPrimitive.content
+        val parentSha = JsonInteraction.readJson("src/main/resources/config.json")!!["parentSha"]!!.jsonArray.map { it.jsonPrimitive.content }
 
-        handleRemote(File("${System.getProperty("user.dir")}/.headchef/tmp/$sha"), repoName, sha)
+        if(parentSha.contains(sha)) {
+            Path("${System.getProperty("user.dir")}/.headchef/tmp/$sha").deleteIfExists() //Delete temp files
+            return println("Already sent this step")
+        }
+
+        handleRemote(File("${System.getProperty("user.dir")}/.headchef/tmp/$sha"), repoName, sha, parentSha)
+        JsonInteraction.writeJson("src/main/resources/config.json", Json.decodeFromString("{\"repoName\":\"$repoName\",\"parentSha\":[\"$sha\"]}"))
         Path("${System.getProperty("user.dir")}/.headchef/tmp/$sha").deleteIfExists() //Delete temp files
     }
 
-    private fun handleRemote(diff: File, repoName: String, sha: String): okhttp3.Response {
+    private fun handleRemote(diff: File, repoName: String, sha: String, parentSha: List<String>): okhttp3.Response {
         return RemoteInteraction.sendRequestToRemote(
             buildRequest(
-                "http://localhost:8000/cook/$repoName/$sha",
+                "http://localhost:8080/cook/$repoName/$sha/${parentSha.joinToString(",")}",
                 buildMultipartBody(
                     MultipartBody.FORM,
                     setOf(diff)

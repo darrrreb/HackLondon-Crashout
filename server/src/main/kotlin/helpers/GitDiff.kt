@@ -31,13 +31,6 @@ object GitDiff {
         // put it in the cuhloud
     }
 
-    fun receiveInit() {
-        // Will receive: Lots of files, repoName
-        // Make bucket
-        // put stuff in bucket
-        // success
-    }
-
     fun receivePull() {
         // Will receive: one SHA
         // Will return all files at this commit

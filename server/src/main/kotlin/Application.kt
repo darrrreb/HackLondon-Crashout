@@ -16,7 +16,6 @@ import kotlinx.serialization.json.jsonObject
 fun Application.module() {
     configureRouting()
     val json = readJsonFile("src/main/resources/s3config.json")
-    println(json)
     S3Service.init(S3Manager(json["s3"]!!.jsonObject, StsClient {region = "eu-west-2"}))
 }
 
@@ -27,13 +26,12 @@ fun readJsonFile(path: String): JsonObject {
 }
 
 @Serializable
-data class Step(
+data class Step (
     val sha: String,
-    val parentSha: List<String>,
+    val parentSha: List<String>?,
     val childrenSha: List<String>,
     val shortMessage: String,
     val longMessage: String,
-    val diffRef: String,
     val date: String = Instant.now().toString()
 )
 
@@ -43,9 +41,7 @@ fun shaStep(diff: ByteArray, date: String) =
 
 
 object Constants {
-    const val SERVE_ENDPOINT: String = "/serve"
-}
-fun processServe(data: JsonObject) {
-    println("Processing serve request")
-    println(data)
+    const val PREP_ENDPOINT: String = "/prep/{name}/{sha}"
+    const val COOK_ENDPOINT: String = "/cook/{name}/{sha}"
+
 }

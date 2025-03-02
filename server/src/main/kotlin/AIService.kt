@@ -16,6 +16,8 @@ object AIService {
             Example outputs could be "Add feature X" or "Fix bug Y".
             You must evaluate the data given and try to understand the programmer's intent and summarise it in a concise manner.
             The data will be provided as a unified diff between two git commits.
+            
+            Data: $data
             """.trimIndent()
 
         val params = ChatCompletionCreateParams.builder()
@@ -37,6 +39,8 @@ object AIService {
            
             You must evaluate the data given and try to understand the programmer's intent and summarise it in a concise manner.
             The data will be in the form of a diff between two git commits.
+            
+            Data: $data
             """.trimIndent()
 
         val params = ChatCompletionCreateParams.builder()

@@ -49,17 +49,17 @@ class InitialiseCommand : Runnable {
         }
 
         // Write the repo name to the config file. Since this is an initialisation, the parentSha is null.
-        JsonInteraction.writeJson(
-            "src/main/resources/config.json",
-            Json.parseToJsonElement("{ \"repoName\":\"$repoName\", \"parentSha\":\"${JsonNull}\"}").jsonObject
-        )
 
         val files = FileHandler.getFiles()
         val ignoredFileNames = FileHandler.getIgnoredFilesNames()
         val fileChanges = getFilesToSend(files, ignoredFileNames)
-
-        if (handleRemote(fileChanges).isSuccessful) {
+        val sha = Hasher.sha(fileChanges.toList())
+        if (handleRemote(fileChanges, sha).isSuccessful) {
             handleLocal(fileChanges, ignoredFileNames)
+            JsonInteraction.writeJson(
+                "src/main/resources/config.json",
+                Json.parseToJsonElement("{ \"repoName\":\"$repoName\", \"parentSha\":\"$sha\"}").jsonObject
+            )
             println("Repository initialised successfully!")
         } else {
             println("Failed to initialise repository")
@@ -75,10 +75,11 @@ class InitialiseCommand : Runnable {
         FileHandler.cloneCurrentState()
     }
 
-    private fun handleRemote(fileChanges: Set<File>): okhttp3.Response {
+    private fun handleRemote(fileChanges: Set<File>, sha: String): okhttp3.Response {
+        println(repoName)
         return RemoteInteraction.sendRequestToRemote(
             buildRequest(
-                "http://localhost:8000/init/$repoName/${Hasher.sha(fileChanges.toList())}",
+                "http://localhost:8080/prep/$repoName/$sha",
                 buildMultipartBody(
                     MultipartBody.FORM,
                     fileChanges

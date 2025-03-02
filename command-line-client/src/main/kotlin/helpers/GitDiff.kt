@@ -3,10 +3,13 @@ import com.github.difflib.UnifiedDiffUtils
 import java.io.File
 import java.io.BufferedWriter
 import java.io.FileWriter
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
 
 object GitDiff {
     fun generateDiffFile(oldList: List<File>, newList: List<File>, path: String, sha: String) {
         val difference = generateDiff(oldList, newList)
+        Path(path).createDirectories()
         BufferedWriter(FileWriter(path + sha)).use { writer ->
             for (i in difference.indices) {
                 writer.write(difference[i].fileName)
