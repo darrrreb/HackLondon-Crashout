@@ -15,7 +15,7 @@ import '@xyflow/react/dist/style.css';
 import {initialNodes, initialEdges, createNodesFromSteps, steps} from './initialElements.js';
 import { ArrowLeftCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import bookmark from "../assets/images/bookmark.png";
 import { StepModal } from "../components/StepModal.jsx";
 
@@ -64,6 +64,8 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 );
 
 const Flow = () => {
+  const [merge, setMerge] = useState(false);
+  const [sha1, setSha1] = useState("");
   const [show, setShow] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
   const navigate = useNavigate();
@@ -80,6 +82,25 @@ const Flow = () => {
     setSelectedNode(node);
     handleShow();
   }
+
+  const handleMerge = (event, node) => {
+    if (sha1 == "") {
+      console.log(node.data.sha);
+      setSha1(node.data.sha);
+    } else if (sha1 == node.data.sha) {
+      setSha1("");
+    } else {
+      console.log(node.data.sha);
+      executeMerge(node.data.sha);
+    }
+  }
+
+  const executeMerge = (sha2) => {
+    //axios with sha1 and sha2
+    console.log(sha1 + " " + sha2);
+    setSha1("");
+  }
+
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -119,7 +140,7 @@ const Flow = () => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={onNodeClick}
+            onNodeClick={merge ? (handleMerge) : (onNodeClick)}
             connectionLineType={ConnectionLineType.SmoothStep}
             fitView
         >
@@ -141,6 +162,7 @@ const Flow = () => {
           <Controls />
         </ReactFlow>
       </div>
+      <Button onClick={() => setMerge(!merge)}>{merge ? ("merge") : ("no merge")}</Button>
       <StepModal node={selectedNode} show={show} handleClose={handleClose}/>
     </>
   );
