@@ -2,6 +2,10 @@ package kcl.seg.rtt.utils.aws
 
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.BucketLocationConstraint
+import aws.sdk.kotlin.services.s3.model.CreateBucketConfiguration
+import aws.sdk.kotlin.services.s3.model.CreateBucketRequest
+import aws.sdk.kotlin.services.s3.model.DeleteBucketRequest
 import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.ListObjectsV2Request
@@ -43,7 +47,7 @@ class S3Manager(
                     s3Config?.let {
                         runCatching { it["role"]!!.jsonPrimitive.content }.getOrNull()
                     }
-                roleSessionName = "oneDayPocSession"
+                roleSessionName = "hacklondon2025"
             }
         return STSInteractor.assumeRole(stsClient, request)
     }
@@ -175,5 +179,28 @@ object S3Service {
                 this.bucket = bucketName
             }
         return s3client.listObjectsV2(request).contents?.mapNotNull { it.key } ?: emptyList()
+    }
+
+    suspend fun createBucket(name: String): Boolean {
+        ensureClient()
+        val request = CreateBucketRequest {
+            this.bucket = name
+            createBucketConfiguration = CreateBucketConfiguration {
+                locationConstraint = BucketLocationConstraint.fromValue("eu-west-2")
+            }
+        }
+        s3client.createBucket(request).also {
+            return true
+        }
+    }
+
+    suspend fun deleteBucket(name: String): Boolean {
+        ensureClient()
+        val request = DeleteBucketRequest {
+            this.bucket = name
+        }
+        s3client.deleteBucket(request).also {
+            return true
+        }
     }
 }
