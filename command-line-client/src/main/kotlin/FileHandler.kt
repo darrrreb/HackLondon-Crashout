@@ -7,9 +7,9 @@ import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
-object FileScanner {
+object FileHandler {
     private val dir: String = System.getProperty("user.dir")
-    private val cloneDir: String = "$dir/.headchef"
+    private val cloneDir: String = "$dir/.headchef/currState"
 
      fun getFiles(): Set<File>{
         return Path(dir)
@@ -27,22 +27,23 @@ object FileScanner {
             .toSet()
     }
 
-    private fun cloneCurrentState(path: String): Boolean {
-        Path(path).deleteIfExists() //Clean up any existing files
+     fun cloneCurrentState(): Boolean {
+        Path(cloneDir).deleteIfExists() //Clean up any existing files
 
         //Recreate the directory and file
-        Path(path).createDirectory()
-        val files = FileScanner.getFiles()
+        Path(cloneDir).createDirectory()
+        val ignoredFileNames = getIgnoredFilesNames()
+        val files = getFiles().filter { it.name !in ignoredFileNames }
         files.forEach {
-            val newPath = Path(path, it.name)
+            val newPath = Path(cloneDir, it.name)
             it.copyTo(newPath.toFile())
         }
         return true
     }
 
 
-    fun getClonedFiles(cloneDir: Path): Set<File> {
-        return cloneDir
+    fun getCurrentState(cloneDir: String): Set<File> {
+        return Path(cloneDir)
             .listDirectoryEntries()
             .filter { maybeFile -> maybeFile.toFile().isFile }
             .map { maybeFile -> maybeFile.toFile() }.toSet()

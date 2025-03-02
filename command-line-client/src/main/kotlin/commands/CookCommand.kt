@@ -1,6 +1,6 @@
 package commands
 
-import FileScanner
+import FileHandler
 import Hasher
 import LocalRepository
 import java.io.File
@@ -15,8 +15,8 @@ class CookCommand : Runnable {
 
         //LIST1: Old and deleted files
         //LIST2: New and modified files
-        val files = FileScanner.getFiles()
-        val ignoredFiles = FileScanner.getIgnoredFilesNames()
+        val files = FileHandler.getFiles()
+        val ignoredFiles = FileHandler.getIgnoredFilesNames()
         //val previousState = GET FROM REMOTE
         val currentState = Hasher.hashAllFiles(files, ignoredFiles)
         val deletedFileNames = LocalRepository.getAllEntryNames().filter { name -> name !in currentState.map { it.first } }
