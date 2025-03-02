@@ -2,13 +2,12 @@ import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
 import crashout.Step
 import kcl.seg.rtt.utils.aws.S3Service
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.BufferedWriter
 import java.io.FileWriter
 
-object GitDiff {
+object GitFunctions {
     fun generateDiffFile(oldList: List<File>, newList: List<File>, path: String) {
         val difference = generateDiff(oldList, newList)
         BufferedWriter(FileWriter(path + "diff")).use { writer ->
@@ -27,31 +26,6 @@ object GitDiff {
         }
     }
 
-    fun receiveStep() {
-        // Step should be sent as diff, repoName, parentCommit, sha
-        // Take parent commit and add this commit to its children list
-        // generate the relevant ai thingies
-        // create a step object
-        // put it in the cuhloud
-    }
-
-    fun receivePull() {
-        // Will receive: one SHA
-        // Will return all files at this commit
-        // Using getDiffs/Applyalldiffs
-    }
-
-    fun sendTreeToFrontend() {
-        // Receives a repo name
-        // Should return the full list of commits from here
-        // Data expected by the front end: Steps(SHA, ShortMessage, [childrenSHAs])
-    }
-
-    fun receiveMergeRequestFromFrontEnd() {
-        // Receives 2 commit SHAs
-        // merges dem ones dere
-        // returns a success or fail msg
-    }
 
     suspend fun getDiffs(repoName: String,fromSha: String) : List<File>{
         var stepString = S3Service.getFile(repoName, "steps/" + fromSha + ".json")
@@ -65,7 +39,7 @@ object GitDiff {
             parentSha = step.parentSha
         }
         shlist.reverse()
-        val diffs = emptyList<File>() //Enzos method thingy to get em all
+        val diffs = emptyList<File>() // Get from AWS
         var diffList = mutableListOf<File>()
         for (sha in shlist) {
             for (diff in diffs) {
@@ -121,7 +95,7 @@ object GitDiff {
         }
 
         for (diff in diffList) {
-            var fileList = listOf<File>() //get all files in a place - perhaps clone initial files into a file to work with?
+            var fileList = listOf<File>() // Get all files in one directory to apply diffs on
             val str = parseApplyDiff(fileList, directoryPath, diff)
             if (str == "") { return "" } else { return str }
         }

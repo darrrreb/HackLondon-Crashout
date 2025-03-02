@@ -13,7 +13,7 @@ export const StepModal = ({ node, show, handleClose }) => {
             <div style={{ overflowWrap: 'break-word', wordWrap: 'break-word' }}>
               <div style={{ marginBottom: '1em' }}>SHA: {node.data.sha}</div>
               <div style={{ marginBottom: '1em' }}>Short message: {node.data.label}</div>
-              <div>Summary: {node.data.summary}</div>
+              <div>Summary: {node.data.longMessage}</div>
             </div>
           ) : (
             <div>No node selected</div>

@@ -49,11 +49,11 @@ export const initialEdges = [
 ];
 
 export const STEPS = [
-  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVKBJLksldfjlsdkfj', shortMessage: "Add feature a", summary:"Test summary!!", childrenSha: ['ABClsdkfs'] },
-  { sha: 'ABClsdkfs', shortMessage: "Add feature b", summary:"Test summary!!", childrenSha: ['HTGBNCKSLKDFJLSK', 'GGTY498324fsdlkjf'] },
-  { sha: 'HTGBNCKSLKDFJLSK', shortMessage: "Add feature c", summary:"Test summary!!", childrenSha: [] },
-  { sha: 'GGTY498324fsdlkjf', shortMessage: "Add feature d", summary:"Test summary!!", childrenSha: [] },
-  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVebgds', shortMessage: "Add feature z", summary:"Test summary!!", childrenSha: ['ABClsdkfs'] },
+  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVKBJLksldfjlsdkfj', shortMessage: "Add feature a", longMessage:"Test longMessage!!", childrenSha: ['ABClsdkfs'] },
+  { sha: 'ABClsdkfs', shortMessage: "Add feature b", longMessage:"Test longMessage!!", childrenSha: ['HTGBNCKSLKDFJLSK', 'GGTY498324fsdlkjf'] },
+  { sha: 'HTGBNCKSLKDFJLSK', shortMessage: "Add feature c", longMessage:"Test longMessage!!", childrenSha: [] },
+  { sha: 'GGTY498324fsdlkjf', shortMessage: "Add feature d", longMessage:"Test longMessage!!", childrenSha: [] },
+  { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVebgds', shortMessage: "Add feature z", longMessage:"Test longMessage!!", childrenSha: ['ABClsdkfs'] },
 ]
 
 export const createNodesFromSteps = (steps) => {
@@ -76,7 +76,7 @@ export const createNodesFromSteps = (steps) => {
       data: {
         label: step.shortMessage,
         sha: step.sha,
-        summary: step.summary
+        longMessage: step.longMessage,
       },
       position,  // Placeholder position
     });
@@ -87,22 +87,22 @@ export const createNodesFromSteps = (steps) => {
     idCounter += 1;  // Increment ID counter for the next node
 
     // Create edges to each child node recursively
-    step.childrenSha.forEach((childSha) => {
+    step.parentSha.forEach((parent) => {
       // Ensure the child node exists or is created
-      if (!shaToIdMap.has(childSha) && !visited.has(childSha)) {
-        visited.add(childSha);
-        traverse(childSha);
+      if (!shaToIdMap.has(parent) && !visited.has(parent)) {
+        visited.add(parent);
+        traverse(parent);
       }
 
       // Create an edge between the current node and the child node
       edges.push({
-        id: `e${currentId}-${shaToIdMap.get(childSha)}`,
-        source: currentId,
-        target: shaToIdMap.get(childSha),
+        id: `e${currentId}-${shaToIdMap.get(parent)}`,
+        source: shaToIdMap.get(parent),
+        target: currentId,
         type: edgeType,  // Customize edge type if needed
         animated: true,       // Make edges animated for better visibility
       });
-      console.log(`Pushed edge with source: ${currentId} and target: ${shaToIdMap.get(childSha)}`)
+      console.log(`Pushed edge with source: ${currentId} and target: ${shaToIdMap.get(parent)}`)
     });
   };
 

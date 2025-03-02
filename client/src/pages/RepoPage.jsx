@@ -80,7 +80,7 @@ const Flow = () => {
 
 // Fetch data only once when the component mounts
   useEffect(() => {
-    axios.get("http://localhost:8080/api/steps/demo")
+    axios.get("http://localhost:8080/api/steps/demonstration")
       .then((response) => {
         const byteArrays = response.data.map((step) => new Uint8Array(step));
         const jsonStrings = byteArrays.map((byteArray) => new TextDecoder().decode(byteArray));

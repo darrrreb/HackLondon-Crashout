@@ -13,6 +13,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import io.ktor.util.logging.Logger
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.File
 import kcl.seg.rtt.utils.aws.S3Service
@@ -24,7 +25,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.Json.Default.decodeFromString
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import org.slf4j.LoggerFactory
 
 fun Application.configureRouting() {
     routing {
@@ -63,7 +67,7 @@ fun Route.configureMainRoute() {
             part.dispose()
         }
 
-        createStep(sha, null, emptyList(), "Initial Step", "Initialise the Cookbook", name)
+        createStep(sha, emptyList(), emptyList(), "Initial Step", "Initialise the Cookbook", name)
         call.respond(HttpStatusCode.OK, "Files uploaded successfully to $uploadDir")
     }
 
@@ -80,15 +84,33 @@ fun Route.configureMainRoute() {
         val shortMessage = AIService.shortMessage(String(diff))
         val longMessage = AIService.longMessage(String(diff))
         createStep(sha, parentSha, emptyList(),  shortMessage, longMessage, name)
+        val logger: Logger = LoggerFactory.getLogger("Step")
+        parentSha.forEach { psha ->
+            val parentBytes = S3Service.getFile("hl2025-cookbook-$name", "steps/$psha.json")
+            S3Service.deleteObject("hl2025-cookbook-$name", "steps/$psha.json")
+            val parentString = String(parentBytes)
+            val jsonObject = Json.decodeFromString<JsonObject>(parentString)
+            logger.info("Original JSON: $jsonObject")
 
-        val parent = S3Service.getFile("hl2025-cookbook-$name", "steps/$parentSha.json")
-        val parentString = String(parent)
-        val decoded = Json.decodeFromString<JsonObject>(parentString)
-        decoded.get("childrenSha")?.jsonArray?.plus(sha)
-        val temp = File.createTempFile("temp", ".json")
-        temp.writeBytes(Json.encodeToString<JsonObject>(decoded).toByteArray())
-        S3Service.uploadFile("hl2025-cookbook-$name", temp, "steps/$parentSha.json")
-        temp.delete()
+            val childrenList: List<String> = jsonObject["childrenSha"]?.jsonArray
+                ?.map { it.jsonPrimitive.content } ?: emptyList()
+
+            val updatedChildrenList = childrenList + psha
+            logger.info("Updated childrenSha list: $updatedChildrenList")
+
+            val updatedJsonMap = jsonObject.toMutableMap()
+            updatedJsonMap["childrenSha"] = Json.encodeToJsonElement(updatedChildrenList)
+            val updatedJsonObject = JsonObject(updatedJsonMap)
+
+            val updatedJsonString = Json.encodeToString(updatedJsonObject)
+
+            val tempFile = File.createTempFile("temp", ".json")
+            tempFile.writeBytes(updatedJsonString.toByteArray())
+
+            S3Service.uploadFile("hl2025-cookbook-$name", tempFile, "steps/$psha.json")
+            tempFile.delete()
+        }
+
 
         call.respond(HttpStatusCode.OK, "Step created successfully")
     }
@@ -101,7 +123,7 @@ fun Route.configureMainRoute() {
 
 }
 
-suspend fun createStep(sha: String, parentSha: List<String>?, childrenSha: List<String>, shortMessage: String, longMessage: String, bucketName: String): Step {
+suspend fun createStep(sha: String, parentSha: List<String>, childrenSha: List<String>, shortMessage: String, longMessage: String, bucketName: String): Step {
     val step = Step(sha = sha, parentSha = parentSha, childrenSha = childrenSha, shortMessage = shortMessage , longMessage = longMessage,)
     val temp = withContext(Dispatchers.IO) {
         File.createTempFile("step", ".json")
