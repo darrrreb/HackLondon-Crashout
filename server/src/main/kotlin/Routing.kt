@@ -80,6 +80,13 @@ fun Route.configureMainRoute() {
         createStep(sha, parentSha, emptyList(),  shortMessage, longMessage, name)
         call.respond(HttpStatusCode.OK, "Step created successfully")
     }
+
+    get("/api/steps/{repoName}"){
+        val repoName = call.parameters["repoName"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing repo name!")
+        val steps = S3Service.downloadDirectory(repoName, "steps")
+        call.respond(HttpStatusCode.OK, Json.encodeToString(steps))
+    }
+
 }
 
 suspend fun createStep(sha: String, parentSha: List<String>?, childrenSha: List<String>, shortMessage: String, longMessage: String, bucketName: String): Step {
