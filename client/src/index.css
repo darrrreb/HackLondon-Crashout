@@ -180,3 +180,11 @@ button {
   background-color: #5b2323;
   color: white;
 }
+
+.merge-btn {
+  background-color: #5b2323;
+}
+
+.merge-btn:hover {
+  background-color: #a14949;
+}

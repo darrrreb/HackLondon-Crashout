@@ -12,12 +12,14 @@ import dagre from '@dagrejs/dagre';
 
 import '@xyflow/react/dist/style.css';
 
-import {initialNodes, initialEdges, createNodesFromSteps, steps} from './initialElements.js';
+import {initialNodes, initialEdges, createNodesFromSteps, STEPS} from './initialElements.js';
 import { ArrowLeftCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 import bookmark from "../assets/images/bookmark.png";
 import { StepModal } from "../components/StepModal.jsx";
+
+import axios from "axios";
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -56,12 +58,12 @@ const getLayoutedElements = (nodes, edges, direction = 'LR') => {
   return { nodes: newNodes, edges };
 };
 
-const { nodes: rawNodes, edges: rawEdges } = createNodesFromSteps(steps);
-
-const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-  rawNodes,
-  rawEdges,
-);
+// const { nodes: rawNodes, edges: rawEdges } = createNodesFromSteps(STEPS);
+//
+// const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+//   rawNodes,
+//   rawEdges,
+// );
 
 const Flow = () => {
   const [steps, setSteps] = useState([]);
@@ -71,12 +73,29 @@ const Flow = () => {
   const [selectedNode, setSelectedNode] = useState(null);
   const navigate = useNavigate();
 
+
+
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
 
-  useEffect (() => {
-    //getSteps();
-  }, [])
+  useEffect(() => {
+    setSteps(STEPS);
+    addGraph(steps);
+  }, [STEPS, steps]);
+
+  const addGraph = (newSteps) => {
+    console.log("steps", steps);
+    const { nodes: rawNodes, edges: rawEdges } = createNodesFromSteps(steps);
+    console.log("raw nodes", rawNodes);
+
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      rawNodes,
+      rawEdges,
+    );
+
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+  }
 
   const getSteps = async () => {
     await axios.get("localhost:8080/cookbook/")
@@ -95,28 +114,37 @@ const Flow = () => {
     handleShow();
   }
 
-  const handleMerge = (event, node) => {
-    if (sha1 == "") {
+  const [clickedNodes, setClickedNodes] = useState([]);
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const handleMerge = async (event, node) => {
+    setNodes((nds) => nds.map((n) => n.id === node.id ? { ...n, style: { ...n.style, backgroundColor: '#5b2323' } } : n));
+    if (sha1 === "") {
       console.log(node.data.sha);
       setSha1(node.data.sha);
-    } else if (sha1 == node.data.sha) {
+    } else if (sha1 === node.data.sha) {
       setSha1("");
     } else {
       console.log(node.data.sha);
-      executeMerge(node.data.sha);
+      await sleep(1000);
+      executeMerge(node, node.data.sha);
     }
-  }
+  };
 
-  const executeMerge = (sha2) => {
-    axios.post("localhost:8080/merge/" + sha1 + "/" + sha2, {})
+  const executeMerge = (node, sha2) => {
+    setNodes((nds) => nds.map((n) => ({ ...n, style: { ...n.style, backgroundColor: '#a14949' } })));
+    axios.post("http://localhost:8080/merge/" + sha1 + "/" + sha2, {})
       .then(response => {
-        getSteps();
+        getSteps();  // Fetch updated steps after merge
       })
-    setSha1("");
-  }
+      .catch(error => console.error("Merge error:", error));
+    setSha1("");  // Reset selected SHA
+  };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const onConnect = useCallback(
       (params) =>
@@ -176,7 +204,17 @@ const Flow = () => {
           <Controls />
         </ReactFlow>
       </div>
-      <Button onClick={() => setMerge(!merge)}>{merge ? ("merge") : ("no merge")}</Button>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <Button onClick={() => setMerge(!merge)} className="merge-btn">
+          Currently in:
+          {merge ? " Merge mode" : " View mode"}
+        </Button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <h5>
+          {merge ? "Select two nodes to merge" : ""}
+        </h5>
+      </div>
       <StepModal node={selectedNode} show={show} handleClose={handleClose}/>
     </>
   );

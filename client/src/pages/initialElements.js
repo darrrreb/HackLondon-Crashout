@@ -48,7 +48,7 @@ export const initialEdges = [
   { id: 'e2c2d', source: '2c', target: '2d', type: edgeType, animated: true }
 ];
 
-export const steps = [
+export const STEPS = [
   { sha: 'KLSDF543598592DSLFKNVFVSFUEJDSNCVKBJLksldfjlsdkfj', shortMessage: "Add feature a", summary:"Test summary!!", children: ['ABClsdkfs'] },
   { sha: 'ABClsdkfs', shortMessage: "Add feature b", summary:"Test summary!!", children: ['HTGBNCKSLKDFJLSK', 'GGTY498324fsdlkjf'] },
   { sha: 'HTGBNCKSLKDFJLSK', shortMessage: "Add feature c", summary:"Test summary!!", children: [] },
