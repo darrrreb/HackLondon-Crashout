@@ -1,5 +1,9 @@
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
+import crashout.Step
+import kcl.seg.rtt.utils.aws.S3Service
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.BufferedWriter
 import java.io.FileWriter
@@ -56,20 +60,42 @@ object GitDiff {
         // returns a success or fail msg
     }
 
-    fun getDiffs(fromSha: String) : List<File>{
-        // val step = getStep(fromSha)
-        // step.parents[0].addToList
-        // step.parents[0].parents[0].addToList
-        // etc.
-        // Reverse List
-        // Get the diffs of every step through the reversed list
-        return emptyList()
+    suspend fun getDiffs(repoName: String,fromSha: String) : List<File>{
+        var stepString = S3Service.getFile(repoName, "steps/" + fromSha + ".json")
+        var step = Json.decodeFromString<Step>(stepString)
+        var parentSha = step.parentSha
+        val shlist = listOf(step.sha).toMutableList()
+        while (parentSha != null) {
+            shlist.add(parentSha[0])
+            stepString = S3Service.getFile(repoName, "steps/" + parentSha[0] + ".json")
+            step = Json.decodeFromString<Step>(stepString)
+            parentSha = step.parentSha
+        }
+        shlist.reverse()
+        val diffs = emptyList<File>() //Enzos method thingy to get em all
+        var diffList = mutableListOf<File>()
+        for (sha in shlist) {
+            for (diff in diffs) {
+                if (diff.name == sha) {
+                    diffList.add(diff)
+                }
+            }
+        }
+        return diffList
     }
 
-    fun merge(sha1: String, sha2: String) {
-        val listOfDiffs1 = getDiffs(sha1)
-        val listOfDiffs2 = getDiffs(sha2)
-        val longerList = maxOf(listOfDiffs1, listOfDiffs2, compareBy { it.size })
+    suspend fun merge(repoName: String, sha1: String, sha2: String) {
+        val listOfDiffs1 = getDiffs(repoName, sha1)
+        val listOfDiffs2 = getDiffs(repoName, sha2)
+        val longerList = maxOf(listOfDiffs1, listOfDiffs2, compareBy { it.size }).toMutableList()
+        val shorterList = minOf(listOfDiffs1, listOfDiffs2, compareBy { it.size })
+        for (diff in shorterList) {
+            if (diff in longerList) {
+                continue
+            } else {
+                longerList.add(diff)
+            }
+        }
         val str = applyAllDiffs(longerList, "tmp/")
         if (str == "") {
             applyAllDiffs(listOfDiffs1, "tmp2/")
