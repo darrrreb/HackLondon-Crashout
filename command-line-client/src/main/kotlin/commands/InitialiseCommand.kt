@@ -3,6 +3,8 @@ package commands
 import FileHandler
 import Hasher
 import LocalRepository
+import com.github.kinquirer.KInquirer
+import com.github.kinquirer.components.promptConfirm
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
@@ -26,6 +28,14 @@ class InitialiseCommand : Runnable {
         if (isInitialised()) {
             println("Repository already initialised!")
             return //Exit if already initialised
+        }
+
+        val ignoreFilePath = Path("$dir/.headchefignore")
+        if (!ignoreFilePath.exists()) {
+            val abort: Boolean = KInquirer.promptConfirm(message = "No .chefignorefile found? Continue with a blank one ?", default = false)
+            if (abort) {
+                return
+            }
         }
 
         val files = FileHandler.getFiles()
