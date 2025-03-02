@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Background,
   ReactFlow,
@@ -12,17 +12,19 @@ import dagre from '@dagrejs/dagre';
 
 import '@xyflow/react/dist/style.css';
 
-import { initialNodes, initialEdges } from './initialElements.js';
+import {initialNodes, initialEdges, createNodesFromSteps, steps} from './initialElements.js';
 import { ArrowLeftCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "react-bootstrap";
 import bookmark from "../assets/images/bookmark.png";
+import { StepModal } from "../components/StepModal.jsx";
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-const getLayoutedElements = (nodes, edges, direction = 'TB') => {
+const getLayoutedElements = (nodes, edges, direction = 'LR') => {
   const isHorizontal = direction === 'LR';
   dagreGraph.setGraph({ rankdir: direction });
 
@@ -54,17 +56,30 @@ const getLayoutedElements = (nodes, edges, direction = 'TB') => {
   return { nodes: newNodes, edges };
 };
 
+const { nodes: rawNodes, edges: rawEdges } = createNodesFromSteps(steps);
+
 const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-    initialNodes,
-    initialEdges,
+  rawNodes,
+  rawEdges,
 );
 
 const Flow = () => {
+  const [show, setShow] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
   const navigate = useNavigate();
+
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
 
   const handleNavigation = () => {
     navigate('/');
   };
+
+  const onNodeClick = (event, node) => {
+    console.log('click node', node);
+    setSelectedNode(node);
+    handleShow();
+  }
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -99,9 +114,12 @@ const Flow = () => {
         <ReactFlow
             nodes={nodes}
             edges={edges}
+            nodesDraggable={false}
+            nodesConnectable={false}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onNodeClick={onNodeClick}
             connectionLineType={ConnectionLineType.SmoothStep}
             fitView
         >
@@ -123,6 +141,7 @@ const Flow = () => {
           <Controls />
         </ReactFlow>
       </div>
+      <StepModal node={selectedNode} show={show} handleClose={handleClose}/>
     </>
   );
 };

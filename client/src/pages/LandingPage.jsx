@@ -3,7 +3,7 @@ import { PlusCircleFill } from "react-bootstrap-icons";
 import { Button } from "react-bootstrap";
 import plate_icon from '../assets/images/plate.png'
 import { useNavigate } from "react-router-dom";
-import { AddModal } from './AddModal'
+import { AddModal } from '../components/AddModal.jsx'
 
 const LandingPage = () => {
 	const [show, setShow] = useState(false);
@@ -53,10 +53,10 @@ const LandingPage = () => {
 			<div className="space">
 			</div>
 			<div>
-				<h1 className="main-heading">Tutorials</h1>
+				<h1 className="main-heading">Tutorials (Unreleased)</h1>
 				<br/>
 				<h5 className="main-heading">Getting started</h5>
-				<h5 className="main-heading">Command Line Interface</h5>
+				<h5 className="main-heading" onClick={() => navigate('/cli')} style={{ cursor: "pointer" }}>Command Line Interface</h5>
 				<h5 className="main-heading">How does HEAD Chef work?</h5>
 			</div>
 			<AddModal show={show} handleClose={handleClose} handleAddRepository={handleAddRepository}/>
