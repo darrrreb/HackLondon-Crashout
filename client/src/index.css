@@ -15,6 +15,10 @@
 
 body {
   background-image: url('./assets/images/bg-img.png');
+  background-size: cover;         /* Makes image cover the whole screen */
+  background-repeat: no-repeat;   /* Prevents the image from repeating */
+  background-attachment: fixed;   /* Keeps the image fixed while scrolling */
+  background-position: center;    /* Centers the image */
   min-height: 100vh;
   width: 100vw;
   max-width: 100vw;
