@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.10"
     kotlin("plugin.serialization") version "1.6.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
 }
 
@@ -25,15 +26,21 @@ tasks.test {
     useJUnitPlatform()
 }
 application {
-    mainClass.set("HeadchefCLI")
+    mainClass.set("HeadchefCLIKt")
 }
 
 
-tasks.jar {
+tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = application.mainClass.get()
+        attributes["Main-Class"] = "HeadchefCLIKt"
     }
 }
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    archiveBaseName.set("command-line-client")
+    archiveClassifier.set("")
+}
+
 kotlin {
     jvmToolchain(21)
 }

@@ -5,6 +5,8 @@ import Hasher
 import LocalRepository
 import GitDiff.generateDiffFile
 import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.deleteIfExists
 import picocli.CommandLine.Command
 
 @Command(name = "cook", description = ["Prepares files and sends them to the kitchen"], mixinStandardHelpOptions = true,)
@@ -37,6 +39,10 @@ class CookCommand : Runnable {
         list2.addAll(currentState)
 
         generateDiffFile(list1, list2, "${System.getProperty("user.dir")}/.headchef/tmp/")
+
+        //SEND TO REMOTE
+
+        Path("${System.getProperty("user.dir")}/.headchef/tmp/").deleteIfExists() //Delete temp files
     }
 }
 

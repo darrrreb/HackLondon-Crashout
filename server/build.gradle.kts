@@ -23,6 +23,8 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("aws.sdk.kotlin:s3:1.4.11")
+    implementation("aws.sdk.kotlin:sts:1.4.11")
     implementation("com.openai:openai-java:0.30.0")
     implementation("io.ktor:ktor-client-core:3.1.1")
     implementation("io.ktor:ktor-client-cio:3.1.1")

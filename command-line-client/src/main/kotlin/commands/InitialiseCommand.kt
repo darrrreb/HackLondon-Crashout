@@ -3,6 +3,7 @@ package commands
 import FileHandler
 import Hasher
 import LocalRepository
+import RemoteInteraction
 import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptConfirm
 import java.io.File
@@ -41,8 +42,9 @@ class InitialiseCommand : Runnable {
         val files = FileHandler.getFiles()
         val ignoredFileNames = FileHandler.getIgnoredFilesNames()
         val fileChanges = getFilesToSend(files, ignoredFileNames)
+        handleLocal(fileChanges, ignoredFileNames)
         if (handleRemote(fileChanges).isSuccessful) {
-            handleLocal(fileChanges, ignoredFileNames)
+
             println("Repository initialised successfully!")
         } else {
             println("Failed to initialise repository")
@@ -59,15 +61,13 @@ class InitialiseCommand : Runnable {
     }
 
     private fun handleRemote(fileChanges: Set<File>): okhttp3.Response {
-        return client.newCall(
-            buildRequest(
-                "http://localhost:8000/init",
-                buildMultipartBody(
-                    MultipartBody.FORM,
-                    fileChanges
-                )
+        return RemoteInteraction.sendRequestToRemote(buildRequest(
+            "http://localhost:8000/init",
+            buildMultipartBody(
+                MultipartBody.FORM,
+                fileChanges
             )
-        ).execute()
+        ))
     }
 
     private fun getLocalNameHashPairs(
