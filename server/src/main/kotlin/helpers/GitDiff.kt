@@ -55,13 +55,13 @@ object GitDiff {
 
     suspend fun getDiffs(repoName: String,fromSha: String) : List<File>{
         var stepString = S3Service.getFile(repoName, "steps/" + fromSha + ".json")
-        var step = Json.decodeFromString<Step>(stepString)
+        var step = Json.decodeFromString<Step>(String(stepString))
         var parentSha = step.parentSha
         val shlist = listOf(step.sha).toMutableList()
         while (parentSha != null) {
             shlist.add(parentSha[0])
             stepString = S3Service.getFile(repoName, "steps/" + parentSha[0] + ".json")
-            step = Json.decodeFromString<Step>(stepString)
+            step = Json.decodeFromString<Step>(String(stepString))
             parentSha = step.parentSha
         }
         shlist.reverse()

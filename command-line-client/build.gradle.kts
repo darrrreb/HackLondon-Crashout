@@ -15,11 +15,14 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("info.picocli:picocli:4.7.1")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation ("com.github.kotlin-inquirer:kotlin-inquirer:0.1.0")
     testImplementation(kotlin("test"))
+
 }
 
 tasks.test {

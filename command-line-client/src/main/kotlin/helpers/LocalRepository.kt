@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.io.path.Path
 
 object LocalRepository {
-    val table: MutableList<Entry> = mutableListOf()
+    var table: MutableList<Entry> = mutableListOf()
     val dir: String = System.getProperty("user.dir")
 
     fun newEntry(name: String, hash: String){
@@ -19,8 +19,8 @@ object LocalRepository {
         return table.map { it.name }
     }
 
-    fun removeEntry(hash: String) {
-        table.removeIf { it.hash == hash }
+    fun removeEntry(name: String) {
+        table.removeIf { it.name == name }
     }
 
     fun writeToFile() {

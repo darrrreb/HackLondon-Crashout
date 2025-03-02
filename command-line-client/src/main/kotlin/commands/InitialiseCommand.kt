@@ -8,13 +8,11 @@ import com.github.kinquirer.KInquirer
 import com.github.kinquirer.components.promptConfirm
 import helpers.JsonInteraction
 import java.io.File
-import java.security.MessageDigest
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.jsonObject
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
@@ -58,7 +56,7 @@ class InitialiseCommand : Runnable {
             handleLocal(fileChanges, ignoredFileNames)
             JsonInteraction.writeJson(
                 "src/main/resources/config.json",
-                Json.parseToJsonElement("{ \"repoName\":\"$repoName\", \"parentSha\":\"$sha\"}").jsonObject
+                Json.parseToJsonElement("{ \"repoName\":\"$repoName\", \"parentSha\":[\"$sha\"]}").jsonObject
             )
             println("Repository initialised successfully!")
         } else {
@@ -88,8 +86,6 @@ class InitialiseCommand : Runnable {
         )
     }
 
-
-
     private fun getLocalNameHashPairs(
         files: Set<File>,
         ignoredFiles: Set<String>
@@ -117,9 +113,9 @@ class InitialiseCommand : Runnable {
     }
 
 
-    private fun getFilesToSend(files: Set<File>, ignoredFiles: Set<String>): Set<File> {
+    private fun getFilesToSend(files: Set<File>, ignoredFileNames: Set<String>): Set<File> {
         return files
-            .filter { file -> file.name !in ignoredFiles }.toSet()
+            .filter { file -> file.name !in ignoredFileNames }.toSet()
     }
 
     private fun isInitialised(): Boolean = Path("$dir/.headchef").exists()
