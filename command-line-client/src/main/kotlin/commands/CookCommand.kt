@@ -3,6 +3,7 @@ package commands
 import FileHandler
 import Hasher
 import LocalRepository
+import GitDiff.generateDiffFile
 import java.io.File
 import picocli.CommandLine.Command
 
@@ -34,6 +35,8 @@ class CookCommand : Runnable {
 
         list2.addAll(newStateFiles.filter { it.name in deletedFileNames})
         list2.addAll(currentState)
+
+        generateDiffFile(list1, list2, "${System.getProperty("user.dir")}/.headchef/tmp/")
     }
 }
 
