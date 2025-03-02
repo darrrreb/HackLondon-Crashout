@@ -78,17 +78,24 @@ const Flow = () => {
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
 
+// Fetch data only once when the component mounts
   useEffect(() => {
     axios.get("http://localhost:8080/api/steps/demo")
-        .then((response) => {
-          const byteArrays = response.data.map((step) => new Uint8Array(step));
-          const jsonStrings = byteArrays.map((byteArray) => new TextDecoder().decode(byteArray));
-          const jsonObjects = jsonStrings.map((jsonString) => JSON.parse(jsonString));
-          console.log(jsonObjects);
-          setSteps(jsonObjects.reverse());
-        })
-    //setSteps(STEPS);
-    addGraph();
+      .then((response) => {
+        const byteArrays = response.data.map((step) => new Uint8Array(step));
+        const jsonStrings = byteArrays.map((byteArray) => new TextDecoder().decode(byteArray));
+        const jsonObjects = jsonStrings.map((jsonString) => JSON.parse(jsonString));
+        console.log(jsonObjects);
+        setSteps(jsonObjects.reverse());
+      })
+      .catch((error) => console.error("Error fetching steps:", error));
+  }, []);
+
+// Run addGraph() only when steps change
+  useEffect(() => {
+    if (steps.length > 0) {  // Check if steps is not empty
+      addGraph();  // Run only when steps is updated
+    }
   }, [steps]);
 
   const addGraph = () => {
