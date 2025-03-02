@@ -147,13 +147,13 @@ const Flow = () => {
   };
 
   const executeMerge = (node, sha2) => {
-    setNodes((nds) => nds.map((n) => ({ ...n, style: { ...n.style, backgroundColor: '#a14949' } })));
-    // axios.post("http://localhost:8080/merge/" + sha1 + "/" + sha2, {})
-    //   .then(response => {
-    //     getSteps();  // Fetch updated steps after merge
-    //   })
-    //   .catch(error => console.error("Merge error:", error));
-    setSha1("");  // Reset selected SHA
+    // setNodes((nds) => nds.map((n) => ({ ...n, style: { ...n.style, backgroundColor: '#a14949' } })));
+    // // axios.post("http://localhost:8080/merge/" + sha1 + "/" + sha2, {})
+    // //   .then(response => {
+    // //     getSteps();  // Fetch updated steps after merge
+    // //   })
+    // //   .catch(error => console.error("Merge error:", error));
+    // setSha1("");  // Reset selected SHA
   };
 
 
